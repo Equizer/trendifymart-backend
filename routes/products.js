@@ -18,7 +18,7 @@ router.get('/fetchallproducts', async (req, res) => {
     return res.json({ success, allProducts });
   } catch (error) {
     console.log('Errors: ', error);
-    return res.status(500).json({ success, error: 'Internal server error occured' })
+    return res.status(500).json({ success, message: 'Internal server error occured', error });
   }
 });
 
