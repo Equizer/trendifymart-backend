@@ -17,6 +17,10 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/cartitems', require('./routes/cartItem.js'));
 app.use('/api/bookmarkeditems', require('./routes/bookmarkedItem.js'));
 
+app.get('/', (req, res) => {
+  res.send('Welcome to TrendifyMart Backend');
+})
+
 app.listen(port, () => {
   console.log(`TrendifyMart backend listening at http://localhost:${port}`);
 });
