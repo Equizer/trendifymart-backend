@@ -4,12 +4,11 @@ const { Schema } = mongoose;
 const RatingSchema = new Schema({
   stars: {
     type: [Number],
-    required: true,
     default: []
   },
   count: {
     type: Number,
-    required: true
+    default: 0
   }
 });
 

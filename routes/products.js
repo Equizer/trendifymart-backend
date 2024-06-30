@@ -209,6 +209,9 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
   let success = false;
   let star = req.body.stars
   try {
+    if(star === 0) {
+      return res.status(400).json({ success, error: "You cannot rate a product with '0' stars" });
+    }
 
     if (!req.user.id) {
       return res.status(400).json({ success, message: 'Not allowed' });
@@ -219,8 +222,9 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
       return res.status(400).json({ success, message: 'Product not found!' });
     }
 
+
     if (product.reviewedUsers.some(userId => req.user.id === userId)) {
-      return res.status(400).json({ success, message: 'You already reviewed this product!' })
+      return res.json({ success, message: 'You already reviewed this product!' })
     }
 
     const productStar = await Product.findByIdAndUpdate(req.params.productId,
