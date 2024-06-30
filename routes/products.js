@@ -75,8 +75,8 @@ router.delete('/deleteproduct/:productId', fetchuser, checkSellerStatus, async (
     if (req.user.id !== productToDelete.sellerId) {
       return res.status(401).json({ success, error: 'Not allowed!' });
     }
-    const deleteFromBookmark = await  BookmarkedItem.deleteMany({ productId: req.params.productId });
-    const deleteFromCart = await CartItem.deleteMany({ productId: req.params.productId});
+    const deleteFromBookmark = await BookmarkedItem.deleteMany({ productId: req.params.productId });
+    const deleteFromCart = await CartItem.deleteMany({ productId: req.params.productId });
     productToDelete = await Product.findByIdAndDelete(req.params.productId);
     success = true;
 
@@ -215,15 +215,24 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
     }
 
     let product = await Product.findById(req.params.productId);
-    if(!product) {
+    if (!product) {
       return res.status(400).json({ success, message: 'Product not found!' });
     }
 
-    const productStar = await Product.findByIdAndUpdate(req.params.productId, { $push: { 'rating.stars': req.body.stars } }, { new: true, runValidators: true })
+    if (product.reviewedUsers.some(userId => req.user.id === userId)) {
+      return res.status(400).json({ success, message: 'You already reviewed this product!' })
+    }
+
+    const productStar = await Product.findByIdAndUpdate(req.params.productId,
+      {
+        $push: { 'rating.stars': req.body.stars },
+        $addToSet: { 'reviewedUsers': req.user.id }
+      },
+      { new: true, runValidators: true })
 
     success = true;
 
-    return res.json({ success, message: 'Thank you for rating the product!', productStar, star });
+    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, star });
 
   } catch (error) {
     console.log(error);

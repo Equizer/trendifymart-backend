@@ -50,6 +50,10 @@ const ProductSchema = new Schema({
     type: Array,
     required: true
   },
+  reviewedUsers: {
+    type: Array,
+    default: [],
+  },
   dateProductAdded: {
     type: Date,
     default: Date.now
@@ -61,7 +65,7 @@ module.exports = Product;
 
 
 /* 
-this is a sample of the body for adding a product
+this is a sample of the body for adding a product 
 {
   "imageUrl": "sampleurl",
   "name": "Nike Cleats",
