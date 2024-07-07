@@ -6,7 +6,8 @@ require('dotenv').config();
 connectToMongo();
 const app = express();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5000; //commmented out rn but remove it when launching the app
+// const port = process.env.PORT || 5000;
 
 app.use(cors());
 

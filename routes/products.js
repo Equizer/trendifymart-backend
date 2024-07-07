@@ -15,7 +15,7 @@ router.get('/fetchallproducts', async (req, res) => {
   try {
     const allProducts = await Product.find();
     success = true;
-    return res.json({ success, allProducts });
+    return res.json({ success, allProducts});
   } catch (error) {
     console.log('Errors: ', error);
     return res.status(500).json({ success, message: 'Internal server error occured', error });
@@ -39,7 +39,7 @@ router.post('/addproduct', [
   }
 
   try {
-    const { imageUrl, name, description, rating, priceCents, keywords, condition, inStock } = req.body;
+    const { imageUrl, name, description, priceCents, keywords, condition, inStock } = req.body;
 
     const sellerId = req.user.id;
 
@@ -52,7 +52,7 @@ router.post('/addproduct', [
     }
 
 
-    const product = await Product.create({ sellerId, imageUrl, name, description, rating, condition, inStock, priceCents, keywords });
+    const product = await Product.create({ sellerId, imageUrl, name, description, condition, inStock, priceCents, keywords });
     success = true;
     return res.json({ success, product, message: 'Product Added Successfuly!' });
 

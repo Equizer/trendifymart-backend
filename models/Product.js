@@ -30,9 +30,8 @@ const ProductSchema = new Schema({
     required: true
   },
   rating: {
-    type: RatingSchema,
-    required: true
-  },
+    type: RatingSchema
+    },
   priceCents: {
     type: Number,
     required: true
