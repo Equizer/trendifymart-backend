@@ -27,8 +27,6 @@ router.post('/addproduct', [
   body('imageUrl', 'Enter an image URL').notEmpty(),
   body('name', 'Product name must be atleast 5 character').isLength({ min: 5 }),
   body('description', 'Enter Product Description').notEmpty(),
-  body('rating.stars', 'stars cannot be empty').notEmpty(),
-  body('rating.count', 'count cannot be empty').notEmpty(),
   body('condition', 'Choose the condtion of your product').notEmpty(),
   body('priceCents', 'Enter a price for your product').notEmpty(),
   body('keywords', 'Enter some keywords for your product').notEmpty()
@@ -47,6 +45,10 @@ router.post('/addproduct', [
 
     if (!req.user.id) {
       return res.status(400).json({ success, error: 'Not allowed' });
+    }
+
+    if (!req.body.priceCents) {
+      return res.status(400).json({success, message: 'Price cannnot be 0'})
     }
 
 
@@ -96,8 +98,6 @@ router.delete('/deleteproduct/:productId', fetchuser, checkSellerStatus, async (
 router.put('/editproduct/:productId', [
   body('imageUrl', 'Enter an image URL').notEmpty(),
   body('name', 'Product name must be atleast 5 character').isLength({ min: 5 }),
-  body('rating.stars', 'stars cannot be empty').notEmpty(),
-  body('rating.count', 'count cannot be empty').notEmpty(),
   body('condition', 'Choose the condtion of your product').notEmpty(),
   body('priceCents', 'Enter a price for your product').notEmpty(),
   body('keywords', 'Enter some keywords for your product').notEmpty(),
@@ -111,7 +111,7 @@ router.put('/editproduct/:productId', [
       name: '',
       description: '',
       rating: {
-        stars: 0,
+        stars: [],
         count: 0,
       },
       condition: '',
