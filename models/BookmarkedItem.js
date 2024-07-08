@@ -5,13 +5,15 @@ const { Schema } = mongoose;
 const RatingSchema = new Schema({
   stars: {
     type: [Number],
-    required: true
+    required: true,
+    default: []
   },
   count: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   }
-})
+});
 
 const BookmarkedItemSchema = new Schema({
   productId: {

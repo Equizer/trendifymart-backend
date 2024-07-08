@@ -207,6 +207,7 @@ router.get('/fetchsellerproducts', fetchuser, checkSellerStatus, async (req, res
 
 router.put('/addStars/:productId', fetchuser, async (req, res) => {
   let success = false;
+  let reviewed = false;
   let star = req.body.stars
   try {
     if(star === 0) {
@@ -224,6 +225,7 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
 
 
     if (product.reviewedUsers.some(userId => req.user.id === userId)) {
+      reviewed = true;
       return res.json({ success, message: 'You already reviewed this product!' })
     }
 
@@ -236,18 +238,12 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
 
     success = true;
 
-    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, star });
+    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, star, reviewed });
 
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
   }
 });
-
-
-
-
-
-
 
 module.exports = router
