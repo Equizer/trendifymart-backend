@@ -51,8 +51,8 @@ router.post('/addbookmark/:productId', fetchuser, [
         name: product.name,
         description: product.description,
         rating: {
-          stars: product.rating.stars,
-          count: product.rating.count
+          stars: product.rating.stars || [],
+          count: product.rating.count || 0
         },
         priceCents: product.priceCents,
         quantity: req.body.quantity,
