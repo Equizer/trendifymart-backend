@@ -52,7 +52,7 @@ router.post('/addproduct', [
     }
 
 
-    const product = await Product.create({ sellerId, imageUrl, name, description, condition, inStock, priceCents, keywords });
+    const product = await Product.create({ sellerId, imageUrl, name, description, rating: { stars: [], count: 0 }, condition, inStock, priceCents, keywords });
     success = true;
     return res.json({ success, product, message: 'Product Added Successfuly!' });
 
