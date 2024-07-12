@@ -15,7 +15,7 @@ router.get('/fetchallproducts', async (req, res) => {
   try {
     const allProducts = await Product.find();
     success = true;
-    return res.json({ success, allProducts});
+    return res.json({ success, allProducts });
   } catch (error) {
     console.log('Errors: ', error);
     return res.status(500).json({ success, message: 'Internal server error occured', error });
@@ -48,7 +48,7 @@ router.post('/addproduct', [
     }
 
     if (!req.body.priceCents) {
-      return res.status(400).json({success, message: 'Price cannnot be 0'})
+      return res.status(400).json({ success, message: 'Price cannnot be 0' })
     }
 
 
@@ -203,14 +203,14 @@ router.get('/fetchsellerproducts', fetchuser, checkSellerStatus, async (req, res
   }
 });
 
-// ROUTE 7: Accept and add user's ratings on a product: POST : '/api/products/addStars'' user login   ([ buyer only ] [ not for seller ])
+// ROUTE 7: Accept and add user's ratings on a product: POST : '/api/products/addStars' user login   ([ buyer only ] [ not for seller ])
 
 router.put('/addStars/:productId', fetchuser, async (req, res) => {
   let success = false;
   let reviewed = false;
   let star = req.body.stars
   try {
-    if(star === 0) {
+    if (star === 0) {
       return res.status(400).json({ success, error: "You cannot rate a product with '0' stars" });
     }
 
@@ -240,6 +240,29 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
 
     return res.json({ success, message: 'Thank you very much for rating the product!', productStar, star, reviewed });
 
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
+  }
+});
+
+
+// ROUTE 8: Check user's status for the reviewed product : get : '/api/products/checkuserreviewstatus'  ([ buyer only ] [ not for seller ] [ no authentication required ])
+
+router.get('/checkuserreviewstatus/:productId', fetchuser, async (req, res) => {
+  let success = false;
+  try {
+    let reviewed = false;
+    const product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(400).json({ success, message: "Product not found" })
+    }
+
+    if (product.reviewedUsers.some(userId => req.user.id === userId)) {
+      reviewed = true;
+      return res.json({ success, reviewed, message: "You have already reviewed this product" });
+    }
+    return res.json({ success, reviewed });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
