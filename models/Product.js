@@ -12,6 +12,17 @@ const RatingSchema = new Schema({
   }
 });
 
+RatingSchema.pre('save', function (next) {
+  this.count = this.stars.length;
+  next();
+});
+RatingSchema.pre('findOneAndUpdate', function (next) {
+  if (this._update.stars) {
+    this._update.count = this._update.stars.length;
+    next();
+  }
+})
+
 const ProductSchema = new Schema({
   sellerId: {
     type: String,
@@ -31,7 +42,7 @@ const ProductSchema = new Schema({
   },
   rating: {
     type: RatingSchema
-    },
+  },
   priceCents: {
     type: Number,
     required: true
@@ -62,15 +73,15 @@ const Product = mongoose.model('products', ProductSchema);
 module.exports = Product;
 
 
-/* 
-this is a sample of the body for adding a product 
-{
-  "imageUrl": "sampleurl",
-  "name": "Nike Cleats",
-  rating: {
-    stars: 4,
-    count: 364
-  },
-  priceCents: 1095,
-  keywords: ["nike cleats", "boots"]
-} */ 
+// {
+//   "imageUrl": "sampleurl",
+//   "name": "Nike Cleats",
+//   "rating": {
+//     "stars": [4],   // Array with the average rating or list of ratings
+//     "count": 364    // Number of reviews
+//   },
+//   "priceCents": 1095,
+//   "keywords": ["nike cleats", "boots"],
+//   "condition": "new",
+//   "inStock": true
+// } 
