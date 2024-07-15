@@ -1,9 +1,10 @@
 // import the Seller schema to use it to find the seller document
 const Seller = require('../models/Seller')
 
-const checkSellerStatus = async (req, res, next) => {
+const checkUserStatus = async (req, res, next) => {
   // initialize a boolean to determine whether the operation was successful or not
   let success = false;
+
 
   // a try and catch block is a recommended way of using as it helps with debugging
   try {
@@ -12,14 +13,7 @@ const checkSellerStatus = async (req, res, next) => {
     const userId = req.user.id;
     // using that user id we will get the user document from our database
     const user = await Seller.findOne({ _id: userId });
-    // if we didn't find any document with that id we will return a bad request
-    if (!user) {
-      return res.json({ success, error: 'You are not elligible to access the feature' })
-    }
-    // if the user trying to access doesn't has seller boolean to be true in their document from DB we won't let the user access and throw a bad request
-    if (!user.seller) {
-      return res.status(400).json({ success, error: 'Not allowed' });
-    }
+    user ? req.user.seller = true : req.user.seller = false;
 
     // 'next' function will cause the next middleware to run if present 
     next();
@@ -30,4 +24,4 @@ const checkSellerStatus = async (req, res, next) => {
   }
 }
 
-module.exports = checkSellerStatus
+module.exports = checkUserStatus

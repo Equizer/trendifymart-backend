@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fetchuser = require('../middleware/fetchuser');
-const checkSellerStatus = require('../middleware/checkSellerStatus');
+const checkUserStatus = require('../middleware/checkUserStatus');
 const Product = require('../models/Product');
 const BookmarkedItem = require('../models/BookmarkedItem')
 const CartItem = require('../models/CartItem');
@@ -30,7 +30,7 @@ router.post('/addproduct', [
   body('condition', 'Choose the condtion of your product').notEmpty(),
   body('priceCents', 'Enter a price for your product').notEmpty(),
   body('keywords', 'Enter some keywords for your product').notEmpty()
-], fetchuser, checkSellerStatus, async (req, res) => {
+], fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
   const errors = validationResult(req);
 
@@ -45,6 +45,10 @@ router.post('/addproduct', [
 
     if (!req.user.id) {
       return res.status(400).json({ success, error: 'Not allowed' });
+    }
+
+    if (!req.user.seller) {
+      return res.status(400).json({ success, error: "Not allowed" });
     }
 
     if (!req.body.priceCents) {
@@ -64,11 +68,16 @@ router.post('/addproduct', [
 
 // Route 3 : Delete a product : DELETE :  '/api/products/deleteproduct' seller login required ([ seller only ] [ not for buyers ])
 
-router.delete('/deleteproduct/:productId', fetchuser, checkSellerStatus, async (req, res) => {
+router.delete('/deleteproduct/:productId', fetchuser, checkUserStatus, async (req, res) => {
 
   let success = false;
 
   try {
+
+    if (!req.user.id || !req.user.seller) {
+      return res.status(400).json({ success, error: 'Not allowed' });
+    }
+
     let productToDelete = await Product.findById(req.params.productId);
 
     if (!productToDelete) {
@@ -102,10 +111,15 @@ router.put('/editproduct/:productId', [
   body('priceCents', 'Enter a price for your product').notEmpty(),
   body('keywords', 'Enter some keywords for your product').notEmpty(),
   body('inStock', 'Enter stock status for the product').notEmpty()
-], fetchuser, checkSellerStatus, async (req, res) => {
+], fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
   try {
     const errors = validationResult(req);
+
+    if (!req.user.id || !req.user.seller) {
+      return res.status(400).json({ success, error: 'Not allowed' });
+    }
+
     let newNote = {
       imageUrl: '',
       name: '',
@@ -162,10 +176,20 @@ router.put('/editproduct/:productId', [
 
 // ROUTE 5: Edit product's stock condition : PUT : 'api/products/editstock' seller login required ([ seller only ] [ not for buyer ])
 
-router.put('/editstock/:productId', [body('inStock', 'Mention what to update the stock to!')], fetchuser, checkSellerStatus, async (req, res) => {
+router.put('/editstock/:productId', [body('inStock', 'Mention what to update the stock to!').isEmpty()], fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success, error: errors.array() });
+  }
 
   try {
+
+    if (!req.user.id || !req.user.seller) {
+      return res.status(400).json({ success, error: 'Not allowed' });
+    }
+
     let product = await Product.findById(req.params.productId);
 
     if (!product) {
@@ -189,10 +213,14 @@ router.put('/editstock/:productId', [body('inStock', 'Mention what to update the
 
 // ROUTE 6: Fetch seller specific products: GET :  '/api/products/fetchsellerproducts' seller login required  ([ seller only ] [ not for buyer ])
 
-router.get('/fetchsellerproducts', fetchuser, checkSellerStatus, async (req, res) => {
+router.get('/fetchsellerproducts', fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
 
   try {
+
+    if (!req.user.id || !req.user.seller) {
+      return res.status(400).json({ success, error: 'Not allowed' });
+    }
 
     const sellerProducts = await Product.find({ sellerId: req.user.id });
     success = true;
@@ -205,11 +233,15 @@ router.get('/fetchsellerproducts', fetchuser, checkSellerStatus, async (req, res
 
 // ROUTE 7: Accept and add user's ratings on a product: POST : '/api/products/addStars' user login   ([ buyer only ] [ not for seller ])
 
-router.put('/addStars/:productId', fetchuser, async (req, res) => {
+router.put('/addStars/:productId', fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
   let reviewed = false;
   let star = req.body.stars
   try {
+
+    if (!req.user.id || req.user.seller) {
+      return res.status(400).json({ success, error: 'Not allowed' });
+    }
     if (star === 0) {
       return res.status(400).json({ success, error: "You cannot rate a product with '0' stars" });
     }
@@ -252,6 +284,10 @@ router.put('/addStars/:productId', fetchuser, async (req, res) => {
 router.get('/checkuserreviewstatus/:productId', fetchuser, async (req, res) => {
   let success = false;
   try {
+
+    if (!req.user.id || req.user.seller) {
+      return res.status(400).json({ success, error: 'Not allowed' });
+    }
     let reviewed = false;
     const product = await Product.findById(req.params.productId);
     if (!product) {

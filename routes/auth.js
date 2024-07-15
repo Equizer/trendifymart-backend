@@ -47,7 +47,8 @@ router.post('/signup', [
     //we can add a field in here that has a name role and that will determine whether the user is a buyer or a seller then in the frontend we can decide whether to let the user access some features like adding a product to the application should be allowed to only a seller not a buyer
     const data = {
       user: {
-        id: user._id
+        id: user._id,
+        seller: false
       }
     }
     const authToken = jwt.sign(data, secretKey);
@@ -90,7 +91,8 @@ router.post('/login', [
 
     const data = {
       user: {
-        id: user._id
+        id: user._id,
+        seller: false
       }
     }
 
@@ -199,7 +201,8 @@ router.post('/sellersignup', [
 
     const data = {
       user: {
-        id: seller._id
+        id: seller._id,
+        seller: true
       }
     };
     const authToken = jwt.sign(data, secretKey);
@@ -242,7 +245,8 @@ router.post('/sellerlogin', [
     }
     const data = {
       user: {
-        id: seller._id
+        id: seller._id,
+        seller: true
       }
     }
     const authToken = jwt.sign(data, secretKey);
