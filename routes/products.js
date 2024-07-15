@@ -176,7 +176,7 @@ router.put('/editproduct/:productId', [
 
 // ROUTE 5: Edit product's stock condition : PUT : 'api/products/editstock' seller login required ([ seller only ] [ not for buyer ])
 
-router.put('/editstock/:productId', [body('inStock', 'Mention what to update the stock to!').isEmpty()], fetchuser, checkUserStatus, async (req, res) => {
+router.put('/editstock/:productId', [body('inStock', 'Mention what to update the stock to!').notEmpty()], fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
   const errors = validationResult(req);
 
@@ -203,7 +203,7 @@ router.put('/editstock/:productId', [body('inStock', 'Mention what to update the
 
     product = await Product.findByIdAndUpdate(req.params.productId, { $set: { inStock: req.body.inStock } }, { new: true, runValidators: true });
     success = true;
-    return res.json({ success, message: 'Product Stock Updated', product })
+    return res.json({ success, message: 'Product Stock Updated!!', product })
   } catch (error) {
     console.error('Error: ', error);
     return res.status(400).json({ success, error: 'Internal server error occured!' })
