@@ -236,14 +236,14 @@ router.get('/fetchsellerproducts', fetchuser, checkUserStatus, async (req, res) 
 router.put('/addStars/:productId', fetchuser, checkUserStatus, async (req, res) => {
   let success = false;
   let reviewed = false;
-  let star = req.body.stars
+  let star = req.body.stars;
   try {
 
     if (!req.user.id || req.user.seller) {
       return res.status(400).json({ success, error: 'Not allowed' });
     }
-    if (star === 0) {
-      return res.status(400).json({ success, error: "You cannot rate a product with '0' stars" });
+    if (star === 0 || star > 5) {
+      return res.status(400).json({ success, error: "You can only rate them between 1-5 stars" });
     }
 
     if (!req.user.id) {
@@ -264,6 +264,7 @@ router.put('/addStars/:productId', fetchuser, checkUserStatus, async (req, res) 
     const productStar = await Product.findByIdAndUpdate(req.params.productId,
       {
         $push: { 'rating.stars': req.body.stars },
+        $inc: { 'rating.count': 1 },
         $addToSet: { 'reviewedUsers': req.user.id }
       },
       { new: true, runValidators: true })

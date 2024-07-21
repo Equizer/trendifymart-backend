@@ -12,17 +12,6 @@ const RatingSchema = new Schema({
   }
 });
 
-RatingSchema.pre('save', function (next) {
-  this.count = this.stars.length;
-  next();
-});
-RatingSchema.pre('findOneAndUpdate', function (next) {
-  if (this._update.stars) {
-    this._update.count = this._update.stars.length;
-    next();
-  }
-})
-
 const ProductSchema = new Schema({
   sellerId: {
     type: String,
