@@ -256,9 +256,9 @@ router.put('/addStars/:productId', fetchuser, checkUserStatus, async (req, res) 
     }
 
 
-    if (product.reviewedUsers.some(userId => req.user.id === userId)) {
+    if (product.reviewedUsers.some(userId => String(userId) === String(req.user.id)  )) {
       reviewed = true;
-      return res.json({ success, message: 'You already reviewed this product!' })
+      return res.json({ success, reviewed, rev: product.reviewedUsers, id: req.user.id, message: 'You already reviewed this product!' })
     }
 
     const productStar = await Product.findByIdAndUpdate(req.params.productId,
@@ -270,12 +270,12 @@ router.put('/addStars/:productId', fetchuser, checkUserStatus, async (req, res) 
       { new: true, runValidators: true })
 
     success = true;
-
-    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, updateBookmark, star, reviewed });
+    reviewed = true;
+    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, star, reviewed });
 
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
+    return res.status(400).json({ success, errorMessage: 'Some Internal server error occured!',error });
   }
 });
 
@@ -306,7 +306,7 @@ router.get('/checkuserreviewstatus/:productId', fetchuser, async (req, res) => {
   }
 });
 
-// ROUTE 9 : Fetch Product's Rating Star Average : get : '/api/products/fetchproductstaravg/:productId'  ([ buyer &`` seller accessible ] [ no authentication required ] )
+// ROUTE 9 : Fetch Product's Rating Star Average : get : '/api/products/fetchproductstaravg/:productId'  ([ buyer &`` seller accessible ] [ no authentication required ])
 
 router.get('/fetchproductstaravg/:productId', async (req, res) => {
   let success = false;
@@ -315,7 +315,7 @@ router.get('/fetchproductstaravg/:productId', async (req, res) => {
     const product = await Product.findById(req.params.productId);
 
     if (!product) {
-      return res.status(404).json({ success, message: 'Product not found!' });
+      return res.status(404).json({ success, message: 'Product not found!'});
     }
     const starArr = product.rating.stars;
     let starSum = 0;
@@ -326,7 +326,7 @@ router.get('/fetchproductstaravg/:productId', async (req, res) => {
     const rawAvg = starSum / starArr.length;
     const average = !rawAvg ? 0 : Math.round(rawAvg * 2) / 2; // ternary
     success = true;
-    return res.json({ success, message: "Fetched Product's average", average, rawAvg});
+    return res.json({ success, message: "Fetched Product's average", average});
 
   } catch (error) {
     return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
