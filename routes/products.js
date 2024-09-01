@@ -331,6 +331,6 @@ router.get('/fetchproductstaravg/:productId', async (req, res) => {
   } catch (error) {
     return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
   }
-})
+});
 
 module.exports = router
