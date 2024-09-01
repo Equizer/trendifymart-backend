@@ -271,7 +271,7 @@ router.put('/addStars/:productId', fetchuser, checkUserStatus, async (req, res) 
 
     success = true;
 
-    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, star, reviewed });
+    return res.json({ success, message: 'Thank you very much for rating the product!', productStar, updateBookmark, star, reviewed });
 
   } catch (error) {
     console.log(error);
@@ -305,5 +305,32 @@ router.get('/checkuserreviewstatus/:productId', fetchuser, async (req, res) => {
     return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
   }
 });
+
+// ROUTE 9 : Fetch Product's Rating Star Average : get : '/api/products/fetchproductstaravg/:productId'  ([ buyer &`` seller accessible ] [ no authentication required ] )
+
+router.get('/fetchproductstaravg/:productId', async (req, res) => {
+  let success = false;
+
+  try {
+    const product = await Product.findById(req.params.productId);
+
+    if (!product) {
+      return res.status(404).json({ success, message: 'Product not found!' });
+    }
+    const starArr = product.rating.stars;
+    let starSum = 0;
+    starArr.forEach((star) => {
+      starSum += star;
+    });
+
+    const rawAvg = starSum / starArr.length;
+    const average = rawAvg === null ? 0: Math.round(rawAvg * 2) / 2; // ternary
+    success = true;
+    return res.json({ success, message: "Fetched Product's average", average });
+
+  } catch (error) {
+    return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
+  }
+})
 
 module.exports = router
