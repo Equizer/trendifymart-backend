@@ -326,7 +326,7 @@ router.get('/fetchproductstaravg/:productId', async (req, res) => {
     const rawAvg = starSum / starArr.length;
     const average = !rawAvg ? 0 : Math.round(rawAvg * 2) / 2; // ternary
     success = true;
-    return res.json({ success, message: "Fetched Product's average", average});
+    return res.json({ success, message: "Fetched Product's average & count", rating: {average, count: product.rating.count}});
 
   } catch (error) {
     return res.status(400).json({ success, errorMessage: 'Internal server error occured!' });
